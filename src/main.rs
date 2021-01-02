@@ -1,6 +1,6 @@
 use actix_web::{get, post, web, App,
                 HttpResponse, HttpServer,
-                Responder};
+                Responder, Result};
 use std::sync::Mutex;
 
 
@@ -28,6 +28,12 @@ async fn count(data: web::Data<AppStateWithCounter>) -> String {
     format!("Request number: {}", counter)
 }
 
+async fn form() -> Result<HttpResponse> {
+    Ok(HttpResponse::Ok()
+           .content_type("text/html; charset=utf-8")
+           .body(include_str!("../static/form.html")))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let counter = web::Data::new(AppStateWithCounter {
@@ -43,6 +49,9 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/ahiahi")
                     .route("/echo.html", web::get().to(echo)),
             )
+            .service(
+                    web::resource("/form")
+                    .route(web::get().to(form)))
             .app_data(counter.clone())
             .route("/count", web::get().to(count))
     })

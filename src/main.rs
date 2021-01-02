@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use actix_web::{get, post, web, App,
+use actix_web::{get, web, App,
                 HttpResponse, HttpServer,
                 Responder, Result};
 use std::sync::Mutex;
@@ -48,29 +48,28 @@ async fn register(params : web::Form<ParamsForRegister>) -> Result<HttpResponse>
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let counter = web::Data::new(AppStateWithCounter {
-        counter: Mutex::new(0),
-    });
     HttpServer::new(move || {
         App::new()
-            .data(AppState {
-                app_name: String::from("Actix-web"),
-            })
-            .service(index)
-            .service(
-                web::scope("/ahiahi")
-                    .route("/echo.html", web::get().to(echo)),
-            )
-            .service(
-                web::resource("/form").route(web::get().to(form))
-            )
-            .service(
-                web::resource("/register").route(web::post().to(register))
-            )
-            .app_data(counter.clone())
-            .route("/count", web::get().to(count))
+            .configure(app_config)
     })
     .bind("localhost:8080")?
     .run()
     .await
+}
+
+fn app_config(config: &mut web::ServiceConfig) {
+    let counter = web::Data::new(AppStateWithCounter {
+        counter: Mutex::new(0),
+    });
+    config.service(
+        web::scope("/")
+            .data(AppState {
+                app_name: "Actix-web".to_string(),
+            })
+            .app_data(counter.clone())
+            .service(web::resource("/echo.html").route(web::get().to(echo)))
+            .service(web::resource("/form").route(web::get().to(form)))
+            .service(web::resource("/register").route(web::post().to(register)))
+            .route("/count", web::get().to(count))
+    );
 }

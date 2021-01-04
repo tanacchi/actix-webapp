@@ -1,5 +1,6 @@
 mod handlers;
 mod state;
+mod param;
 mod config;
 
 #[actix_web::main]

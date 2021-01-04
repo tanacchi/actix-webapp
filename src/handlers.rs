@@ -1,10 +1,10 @@
-use serde::{Deserialize, Serialize};
 use actix_web::{
     web,
     HttpResponse,
     Responder, Result
 };
 use crate::state;
+use crate::param;
 
 pub async fn index(data: web::Data<state::AppState>) -> String {
     let app_name = &data.app_name;
@@ -27,12 +27,7 @@ pub async fn form() -> Result<HttpResponse> {
         .body(include_str!("../static/form.html")))
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ParamsForRegister {
-    name: String,
-}
-
-pub async fn register(params : web::Form<ParamsForRegister>) -> Result<HttpResponse> {
+pub async fn register(params : web::Form<param::ParamsForRegister>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/plain")
         .body(format!("Your name is {}", params.name)))

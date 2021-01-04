@@ -4,17 +4,9 @@ use actix_web::{
     HttpResponse,
     Responder, Result
 };
-use std::sync::Mutex;
+use crate::state;
 
-pub struct AppState {
-    pub app_name: String,
-}
-
-pub struct AppStateWithCounter {
-    pub counter: Mutex<i32>,
-}
-
-pub async fn index(data: web::Data<AppState>) -> String {
+pub async fn index(data: web::Data<state::AppState>) -> String {
     let app_name = &data.app_name;
     format!("Hello {}!", app_name)
 }
@@ -23,7 +15,7 @@ pub async fn echo() -> impl Responder {
     "Wow"
 }
 
-pub async fn count(data: web::Data<AppStateWithCounter>) -> String {
+pub async fn count(data: web::Data<state::AppStateWithCounter>) -> String {
     let mut counter = data.counter.lock().unwrap();
     *counter += 1;
     format!("Request number: {}", counter)

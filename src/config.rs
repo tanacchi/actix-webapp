@@ -1,8 +1,10 @@
 use actix_web::{
     web
 };
+use crate::state::{
+    AppState, AppStateWithCounter
+};
 use crate::handlers::{
-    AppState, AppStateWithCounter,
     index, echo, form, register, count
 };
 use std::sync::Mutex;

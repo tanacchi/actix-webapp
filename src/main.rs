@@ -1,7 +1,7 @@
 mod handlers;
 mod state;
 mod param;
-mod config;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -9,11 +9,11 @@ async fn main() -> std::io::Result<()> {
         App,
         HttpServer,
     };
-    use crate::config;
+    use crate::routes;
 
     HttpServer::new(move || {
         App::new()
-            .configure(config::app_config)
+            .configure(routes::app_config)
     })
     .bind("localhost:8080")?
     .run()

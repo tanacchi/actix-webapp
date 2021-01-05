@@ -1,3 +1,4 @@
+mod config;
 mod handlers;
 mod state;
 mod param;

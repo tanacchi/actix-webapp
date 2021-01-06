@@ -27,3 +27,11 @@ pub async fn get_all_users(client: &Client) -> Result<Vec<User>, MyError> {
        .map(|row| User::from_row_ref(row).unwrap())
        .collect::<Vec<User>>())
 }
+
+pub async fn search_user(client: &Client, name: String) -> Result<User, MyError> {
+    let _stmt = include_str!("../sql/search_user.sql");
+    let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+    let _user = client.query_one(&stmt, &[&name]).await.unwrap();
+    Ok(User::from_row_ref(&_user)?)
+}

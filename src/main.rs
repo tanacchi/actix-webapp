@@ -7,6 +7,7 @@ mod routes;
 mod models;
 mod db;
 
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_web::{
@@ -26,6 +27,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .configure(routes::app_config)
+
     })
     .bind(config.server_addr.clone())?
     .run();

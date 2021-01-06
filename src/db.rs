@@ -15,3 +15,15 @@ pub async fn add_user(client: &Client, user_info: User) -> Result<User, MyError>
         .pop()
         .ok_or(MyError::NotFound)
 }
+
+pub async fn get_all_users(client: &Client) -> Result<Vec<User>, MyError> {
+    let _stmt = include_str!("../sql/get_all_users.sql");
+    let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+    Ok(client
+       .query(&stmt, &[])
+       .await?
+       .iter()
+       .map(|row| User::from_row_ref(row).unwrap())
+       .collect::<Vec<User>>())
+}

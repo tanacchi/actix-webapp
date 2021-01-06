@@ -1,13 +1,3 @@
-mod config;
-mod handlers;
-mod error;
-mod state;
-mod param;
-mod routes;
-mod models;
-mod db;
-
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     use actix_web::{

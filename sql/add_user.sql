@@ -1,3 +1,3 @@
-INSERT INTO testing.users(email, first_name, last_name, username)
-VALUES ($1, $2, $3, $4)
+INSERT INTO testing.users(name)
+VALUES ($1)
 RETURNING $table_fields;

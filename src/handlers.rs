@@ -36,6 +36,8 @@ pub async fn register(params : web::Form<param::ParamsForRegister>, db_pool: web
     Ok(HttpResponse::Ok().json(new_user))
 }
 
-pub async fn user_list() -> String {
-    format!("Yeah!!!")
+pub async fn user_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let users = db::get_all_users(&client).await?;
+    Ok(HttpResponse::Ok().json(users))
 }

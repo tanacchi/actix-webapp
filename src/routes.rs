@@ -4,9 +4,7 @@ use actix_web::{
 use crate::state::{
     AppState, AppStateWithCounter
 };
-use crate::handlers::{
-    index, echo, form, register, count
-};
+use crate::handlers;
 use std::sync::Mutex;
 
 pub fn app_config(config: &mut web::ServiceConfig) {
@@ -15,9 +13,10 @@ pub fn app_config(config: &mut web::ServiceConfig) {
     });
     config.data(AppState {app_name: "Actix-web".to_string()})
         .app_data(counter.clone())
-        .service(web::resource("/").route(web::get().to(index)))
-        .service(web::resource("/echo.html").route(web::get().to(echo)))
-        .service(web::resource("/form").route(web::get().to(form)))
-        .service(web::resource("/register").route(web::post().to(register)))
-        .route("/count", web::get().to(count));
+        .service(web::resource("/").route(web::get().to(handlers::index)))
+        .service(web::resource("/echo.html").route(web::get().to(handlers::echo)))
+        .service(web::resource("/form").route(web::get().to(handlers::form)))
+        .service(web::resource("/register").route(web::post().to(handlers::register)))
+        .route("/count", web::get().to(handlers::count))
+        .route("/users", web::get().to(handlers::user_list));
 }

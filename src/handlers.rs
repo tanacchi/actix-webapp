@@ -35,3 +35,7 @@ pub async fn register(params : web::Form<param::ParamsForRegister>, db_pool: web
     let new_user = db::add_user(&client, user_info).await?;
     Ok(HttpResponse::Ok().json(new_user))
 }
+
+pub async fn user_list() -> String {
+    format!("Yeah!!!")
+}

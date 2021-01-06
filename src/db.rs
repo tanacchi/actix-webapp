@@ -32,6 +32,6 @@ pub async fn search_user(client: &Client, name: String) -> Result<User, MyError>
     let _stmt = include_str!("../sql/search_user.sql");
     let _stmt = _stmt.replace("$table_fields", &User::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
-    let _user = client.query_one(&stmt, &[&name]).await.unwrap();
+    let _user = client.query_one(&stmt, &[&name]).await?;
     Ok(User::from_row_ref(&_user)?)
 }

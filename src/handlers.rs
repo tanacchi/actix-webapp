@@ -41,3 +41,9 @@ pub async fn user_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let users = db::get_all_users(&client).await?;
     Ok(HttpResponse::Ok().json(users))
 }
+
+pub async fn user_show(web::Path(user_name): web::Path<String>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user = db::search_user(&client, user_name).await?;
+    Ok(HttpResponse::Ok().json(user))
+}

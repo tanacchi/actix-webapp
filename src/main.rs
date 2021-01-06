@@ -1,5 +1,6 @@
 mod config;
 mod handlers;
+mod error;
 mod state;
 mod param;
 mod routes;
@@ -21,12 +22,14 @@ async fn main() -> std::io::Result<()> {
     let config = config::Config::from_env().unwrap();
     let pool = config.pg.create_pool(NoTls).unwrap();
 
-    HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
             .data(pool.clone())
             .configure(routes::app_config)
     })
-    .bind("localhost:8080")?
-    .run()
-    .await
+    .bind(config.server_addr.clone())?
+    .run();
+    println!("Server running at https://{}/", config.server_addr);
+
+    server.await
 }

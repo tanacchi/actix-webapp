@@ -47,3 +47,7 @@ pub async fn user_show(web::Path(user_name): web::Path<String>, db_pool: web::Da
     let user = db::search_user(&client, user_name).await?;
     Ok(HttpResponse::Ok().json(user))
 }
+
+pub async fn category_list() -> Result<HttpResponse> {
+    Ok(HttpResponse::Ok().body("Categories"))
+}

@@ -19,5 +19,6 @@ pub fn app_config(config: &mut web::ServiceConfig) {
         .service(web::resource("/register").route(web::post().to(handlers::register)))
         .route("/count", web::get().to(handlers::count))
         .route("/users", web::get().to(handlers::user_list))
-        .route("/users/{user_name}", web::get().to(handlers::user_show));
+        .route("/users/{user_name}", web::get().to(handlers::user_show))
+        .route("categories", web::get().to(handlers::category_list));
 }

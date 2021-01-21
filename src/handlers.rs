@@ -48,6 +48,8 @@ pub async fn user_show(web::Path(user_name): web::Path<String>, db_pool: web::Da
     Ok(HttpResponse::Ok().json(user))
 }
 
-pub async fn category_list() -> Result<HttpResponse> {
-    Ok(HttpResponse::Ok().body("Categories"))
+pub async fn category_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let categories = db::get_all_categories(&client).await?;
+    Ok(HttpResponse::Ok().json(categories))
 }

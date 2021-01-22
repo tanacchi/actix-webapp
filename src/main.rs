@@ -14,6 +14,7 @@ async fn main() -> std::io::Result<()> {
     use actix_web::{
         App,
         HttpServer,
+        middleware::Logger,
     };
     use crate::routes;
     use dotenv::dotenv;
@@ -26,6 +27,7 @@ async fn main() -> std::io::Result<()> {
 
     let server = HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .data(pool.clone())
             .configure(routes::app_config)
 

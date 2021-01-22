@@ -16,6 +16,10 @@ async fn main() -> std::io::Result<()> {
         HttpServer,
         middleware::Logger,
     };
+    use actix_identity::{
+        CookieIdentityPolicy,
+        IdentityService,
+    };
     use crate::routes;
     use dotenv::dotenv;
     use tokio_postgres::NoTls;
@@ -28,6 +32,10 @@ async fn main() -> std::io::Result<()> {
     let server = HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(IdentityService::new(
+                    CookieIdentityPolicy::new(&[0; 32])
+                    .name("auth-cookie")
+                    .secure(false)))
             .data(pool.clone())
             .configure(routes::app_config)
 

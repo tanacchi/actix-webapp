@@ -12,6 +12,10 @@ pub async fn index(data: web::Data<state::AppState>) -> String {
     format!("Hello {}!", app_name)
 }
 
+pub async fn dashboard() -> Result<HttpResponse> {
+    unimplemented!();
+}
+
 pub async fn echo() -> impl Responder {
     "Wow"
 }

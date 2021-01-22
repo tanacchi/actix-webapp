@@ -17,6 +17,7 @@ pub fn app_config(config: &mut web::ServiceConfig) {
         .service(web::resource("/echo.html").route(web::get().to(handlers::echo)))
         .service(web::resource("/signup").route(web::get().to(handlers::signup_form)))
         .service(web::resource("/signup").route(web::post().to(handlers::signup)))
+        .route("/dashboard", web::get().to(handlers::dashboard))
         .route("/signin", web::get().to(handlers::signin_form))
         .route("/signin", web::post().to(handlers::signin))
         .route("/signout", web::get().to(handlers::signout))

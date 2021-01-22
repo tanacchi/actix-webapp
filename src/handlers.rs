@@ -78,8 +78,11 @@ pub async fn signin_form() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().body(html))
 }
 
-pub async fn signin() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn signin(params: web::Form<param::ParamsForSignIn>,
+                    db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user = db::search_user(&client, params.name.clone()).await?;
+    Ok(HttpResponse::Ok().json(user))
 }
 
 pub async fn signout() -> Result<HttpResponse> {

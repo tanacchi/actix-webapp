@@ -59,3 +59,11 @@ pub async fn category_form() -> Result<HttpResponse> {
     let html: String = templates::category_form();
     Ok(HttpResponse::Ok().body(html))
 }
+
+use crate::{models::Category};
+pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let _new_category = Category {name: params.name.clone()};
+    let new_category = db::add_category(&client, _new_category).await?;
+    Ok(HttpResponse::Ok().json(new_category))
+}

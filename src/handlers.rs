@@ -5,6 +5,7 @@ use actix_web::{
 };
 use crate::state;
 use crate::param;
+use crate::templates;
 
 pub async fn index(data: web::Data<state::AppState>) -> String {
     let app_name = &data.app_name;
@@ -55,6 +56,6 @@ pub async fn category_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
 }
 
 pub async fn category_form() -> Result<HttpResponse> {
-    let ahi: String = "AHi".to_string();
-    Ok(HttpResponse::Ok().body(ahi))
+    let html: String = templates::category_form();
+    Ok(HttpResponse::Ok().body(html))
 }

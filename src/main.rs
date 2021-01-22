@@ -1,11 +1,12 @@
 mod config;
-mod handlers;
+mod db;
 mod error;
-mod state;
+mod handlers;
+mod models;
 mod param;
 mod routes;
-mod models;
-mod db;
+mod state;
+mod templates;
 
 
 #[actix_web::main]

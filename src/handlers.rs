@@ -67,3 +67,15 @@ pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_poo
     let new_category = db::add_category(&client, _new_category).await?;
     Ok(HttpResponse::Ok().json(new_category))
 }
+
+pub async fn new_report_form() -> Result<HttpResponse> {
+    unimplemented!();
+}
+
+pub async fn new_report() -> Result<HttpResponse> {
+    unimplemented!();
+}
+
+pub async fn report_show() -> Result<HttpResponse> {
+    unimplemented!();
+}

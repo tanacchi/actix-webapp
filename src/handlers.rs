@@ -92,6 +92,7 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
     Ok(HttpResponse::Ok().json(user))
 }
 
-pub async fn signout() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn signout(id: Identity) -> HttpResponse {
+    id.forget();
+    HttpResponse::Ok().finish()
 }

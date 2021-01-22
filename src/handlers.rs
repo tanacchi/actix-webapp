@@ -12,8 +12,12 @@ pub async fn index(data: web::Data<state::AppState>) -> String {
     format!("Hello {}!", app_name)
 }
 
-pub async fn dashboard() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn dashboard(id: Identity) -> String {
+    if let Some(name) = id.identity() {
+        format!("Welcome, {} !", name)
+    } else {
+        "Please login.".to_string()
+    }
 }
 
 pub async fn echo() -> impl Responder {

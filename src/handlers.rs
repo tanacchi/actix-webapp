@@ -74,7 +74,8 @@ pub async fn signup(params : web::Form<param::ParamsForRegister>, db_pool: web::
 }
 
 pub async fn signin_form() -> Result<HttpResponse> {
-    unimplemented!();
+    let html: String = templates::signin_form();
+    Ok(HttpResponse::Ok().body(html))
 }
 
 pub async fn signin() -> Result<HttpResponse> {

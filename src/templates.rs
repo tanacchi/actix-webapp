@@ -21,3 +21,14 @@ pub fn signup_form() -> String {
     };
     content.into_string()
 }
+
+pub fn signin_form() -> String {
+    let content = html! {
+        p { "Sign In" }
+        form method="POST" {
+            label for="name" { "Name" }
+            input type="string" name="name";
+        }
+    };
+    content.into_string()
+}

@@ -47,3 +47,17 @@ pub async fn get_all_categories(client: &Client) -> Result<Vec<Category>, MyErro
        .map(|row| Category::from_row_ref(row).unwrap())
        .collect::<Vec<Category>>())
 }
+
+pub async fn add_category(client: &Client, caterogy: Category) -> Result<Category, MyError> {
+    let _stmt = include_str!("../sql/add_category.sql");
+    let _stmt = _stmt.replace("$table_fields", &Category::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    client.query(&stmt, &[&caterogy.name])
+        .await?
+        .iter()
+        .map(|row| Category::from_row_ref(row).unwrap())
+        .collect::<Vec<Category>>()
+        .pop()
+        .ok_or(MyError::NotFound)
+}

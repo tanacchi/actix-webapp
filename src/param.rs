@@ -1,7 +1,12 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct ParamsForRegister {
+pub struct ParamsForSignUp {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ParamsForSignIn {
     pub name: String,
 }
 

@@ -78,10 +78,13 @@ pub async fn signin_form() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().body(html))
 }
 
+use actix_identity::Identity;
 pub async fn signin(params: web::Form<param::ParamsForSignIn>,
-                    db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+                    db_pool: web::Data<Pool>,
+                    id: Identity) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user = db::search_user(&client, params.name.clone()).await?;
+    id.remember(user.name.clone());
     Ok(HttpResponse::Ok().json(user))
 }
 

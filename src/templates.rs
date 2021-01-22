@@ -32,3 +32,15 @@ pub fn signin_form() -> String {
     };
     content.into_string()
 }
+
+pub fn dashboard(logged_in: bool) -> String {
+    let content = html! {
+        h1 { "ProChart" }
+        @if logged_in {
+            p { "Welcome" }
+        } @else {
+            p { "Please login." }
+        }
+    };
+    content.into_string()
+}

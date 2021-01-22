@@ -10,12 +10,10 @@ pub async fn index(data: web::Data<state::AppState>) -> String {
     format!("Hello {}!", app_name)
 }
 
-pub async fn dashboard(id: Identity) -> String {
-    if let Some(name) = id.identity() {
-        format!("Welcome, {} !", name)
-    } else {
-        "Please login.".to_string()
-    }
+pub async fn dashboard(id: Identity) -> Result<HttpResponse> {
+    let logged_in: bool = id.identity().is_some();
+    let html: String = templates::dashboard(logged_in);
+    Ok(HttpResponse::Ok().body(html))
 }
 
 pub async fn user_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {

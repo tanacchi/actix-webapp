@@ -38,8 +38,32 @@ pub fn dashboard(logged_in: bool) -> String {
         h1 { "ProChart" }
         @if logged_in {
             p { "Welcome" }
+            p {
+                a href="/" { "Top" }
+            }
+            p {
+                a href="/signout" { "SignOut" }
+            }
+            p {
+                a href="/categories" { "Category List" }
+            }
+            p {
+                a href="/categories/new" { "New Category" }
+            }
+            p {
+                a href="/signout" { "SignOut" }
+            }
         } @else {
             p { "Please login." }
+            p {
+                a href="/signin" { "SignIn" }
+            }
+            p {
+                a href="/signup" { "SignUp" }
+            }
+            p {
+                a href="/users" { "User List" }
+            }
         }
     };
     content.into_string()

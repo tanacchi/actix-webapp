@@ -53,3 +53,8 @@ pub async fn category_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let categories = db::get_all_categories(&client).await?;
     Ok(HttpResponse::Ok().json(categories))
 }
+
+pub async fn category_form() -> Result<HttpResponse> {
+    let ahi: String = "AHi".to_string();
+    Ok(HttpResponse::Ok().body(ahi))
+}

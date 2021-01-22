@@ -1,7 +1,5 @@
 use actix_web::{
-    web,
-    HttpResponse,
-    Responder, Result
+    web, HttpResponse, Result
 };
 use crate::state;
 use crate::param;
@@ -18,16 +16,6 @@ pub async fn dashboard(id: Identity) -> String {
     } else {
         "Please login.".to_string()
     }
-}
-
-pub async fn echo() -> impl Responder {
-    "Wow"
-}
-
-pub async fn count(data: web::Data<state::AppStateWithCounter>) -> String {
-    let mut counter = data.counter.lock().unwrap();
-    *counter += 1;
-    format!("Request number: {}", counter)
 }
 
 pub async fn user_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {

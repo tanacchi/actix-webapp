@@ -1,11 +1,12 @@
 mod config;
-mod handlers;
+mod db;
 mod error;
-mod state;
+mod handlers;
+mod models;
 mod param;
 mod routes;
-mod models;
-mod db;
+mod state;
+mod templates;
 
 
 #[actix_web::main]
@@ -31,7 +32,7 @@ async fn main() -> std::io::Result<()> {
     })
     .bind(config.server_addr.clone())?
     .run();
-    println!("Server running at https://{}/", config.server_addr);
+    println!("Server running at http://{}/", config.server_addr);
 
     server.await
 }

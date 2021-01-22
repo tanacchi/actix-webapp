@@ -6,3 +6,8 @@ CREATE TABLE testing.users (
   name    VARCHAR(200) NOT NULL,
   UNIQUE (name)
 );
+
+CREATE TABLE testing.categories (
+  id      BIGSERIAL PRIMARY KEY,
+  name    VARCHAR(50) NOT NULL UNIQUE
+);

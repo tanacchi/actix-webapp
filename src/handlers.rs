@@ -5,6 +5,7 @@ use actix_web::{
 };
 use crate::state;
 use crate::param;
+use crate::templates;
 
 pub async fn index(data: web::Data<state::AppState>) -> String {
     let app_name = &data.app_name;
@@ -46,4 +47,23 @@ pub async fn user_show(web::Path(user_name): web::Path<String>, db_pool: web::Da
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user = db::search_user(&client, user_name).await?;
     Ok(HttpResponse::Ok().json(user))
+}
+
+pub async fn category_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let categories = db::get_all_categories(&client).await?;
+    Ok(HttpResponse::Ok().json(categories))
+}
+
+pub async fn category_form() -> Result<HttpResponse> {
+    let html: String = templates::category_form();
+    Ok(HttpResponse::Ok().body(html))
+}
+
+use crate::{models::Category};
+pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let _new_category = Category {name: params.name.clone()};
+    let new_category = db::add_category(&client, _new_category).await?;
+    Ok(HttpResponse::Ok().json(new_category))
 }

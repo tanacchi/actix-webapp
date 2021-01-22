@@ -10,3 +10,14 @@ pub fn category_form() -> String {
     };
     content.into_string()
 }
+
+pub fn signup_form() -> String {
+    let content = html! {
+        p { "Sign Up" }
+        form method="POST" {
+            label for="name" { "Name" }
+            input type="string" name="name";
+        }
+    };
+    content.into_string()
+}

@@ -58,9 +58,10 @@ pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_poo
 }
 
 pub async fn signup_form() -> Result<HttpResponse> {
+    let html: String = templates::signup_form();
     Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../static/form.html")))
+       .content_type("text/html; charset=utf-8")
+       .body(html))
 }
 
 use crate::{db, models::User, error::MyError};

@@ -89,8 +89,13 @@ pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().body(html))
 }
 
-pub async fn new_report() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn new_report(params: web::Form<param::ParamsForNewReport>) -> Result<HttpResponse> {
+    println!("comment: {}\ndate:{}\ncategory:{}",
+             params.comment.clone(),
+             params.date.clone(),
+             params.category.clone()
+    );
+    Ok(HttpResponse::Ok().finish())
 }
 
 pub async fn report_show() -> Result<HttpResponse> {

@@ -90,11 +90,23 @@ pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
 }
 
 pub async fn new_report(params: web::Form<param::ParamsForNewReport>) -> Result<HttpResponse> {
-    println!("comment: {}\ndate:{}\ncategory:{}",
+    use chrono::{Date, NaiveDateTime, Local, TimeZone};
+
+    let _date = NaiveDateTime::parse_from_str(
+        &format!("{} 00:00:00", &params.date),
+        "%Y-%m-%d %H:%M:%S"
+    ).unwrap();
+
+
+    let date: Date<Local> = Local.from_local_datetime(&_date)
+        .map(|dt| dt.date())
+        .unwrap();
+    println!("comment: {}\ndate:{:?}\ncategory:{}",
              params.comment.clone(),
-             params.date.clone(),
+             date,
              params.category.clone()
     );
+
     Ok(HttpResponse::Ok().finish())
 }
 

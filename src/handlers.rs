@@ -82,3 +82,17 @@ pub async fn signout(id: Identity) -> HttpResponse {
     id.forget();
     HttpResponse::Ok().finish()
 }
+
+pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
+    let logged_in: bool = id.identity().is_some();
+    let html: String = templates::report_form(logged_in);
+    Ok(HttpResponse::Ok().body(html))
+}
+
+pub async fn new_report() -> Result<HttpResponse> {
+    unimplemented!();
+}
+
+pub async fn report_show() -> Result<HttpResponse> {
+    unimplemented!();
+}

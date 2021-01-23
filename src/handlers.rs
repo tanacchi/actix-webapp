@@ -89,8 +89,10 @@ pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().body(html))
 }
 
-pub async fn new_report(params: web::Form<param::ParamsForNewReport>) -> Result<HttpResponse> {
+pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
+                        db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     use chrono::{Date, NaiveDateTime, Local, TimeZone};
+    use crate::models::Report;
 
     let date: Date<Local> = NaiveDateTime::parse_from_str(
         &format!("{} 00:00:00", &params.date),
@@ -100,13 +102,22 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>) -> Result<
         .map(|dt| dt.date())
         .unwrap();
 
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let _new_report = Report {
+        comment: params.comment.clone(),
+        date: date.format("%Y-%m-%d").to_string(),
+        category_id: 1,
+        user_id: 1
+    };
+    let new_report = db::add_report(&client, _new_report).await?;
+
     println!("comment: {}\ndate:{:?}\ncategory:{}",
              params.comment.clone(),
              date,
              params.category.clone()
     );
 
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::Ok().json(new_report))
 }
 
 pub async fn report_show() -> Result<HttpResponse> {

@@ -1,7 +1,5 @@
 use actix_web::{
-    web,
-    HttpResponse,
-    Responder, Result
+    web, HttpResponse, Result
 };
 use crate::state;
 use crate::param;
@@ -12,29 +10,10 @@ pub async fn index(data: web::Data<state::AppState>) -> String {
     format!("Hello {}!", app_name)
 }
 
-pub async fn echo() -> impl Responder {
-    "Wow"
-}
-
-pub async fn count(data: web::Data<state::AppStateWithCounter>) -> String {
-    let mut counter = data.counter.lock().unwrap();
-    *counter += 1;
-    format!("Request number: {}", counter)
-}
-
-pub async fn form() -> Result<HttpResponse> {
-    Ok(HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(include_str!("../static/form.html")))
-}
-
-use crate::{db, models::User, error::MyError};
-use deadpool_postgres::{Client, Pool};
-pub async fn register(params : web::Form<param::ParamsForRegister>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
-    let user_info = User {name: params.name.clone()};
-    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let new_user = db::add_user(&client, user_info).await?;
-    Ok(HttpResponse::Ok().json(new_user))
+pub async fn dashboard(id: Identity) -> Result<HttpResponse> {
+    let logged_in: bool = id.identity().is_some();
+    let html: String = templates::dashboard(logged_in);
+    Ok(HttpResponse::Ok().body(html))
 }
 
 pub async fn user_list(db_pool: web::Data<Pool>) -> Result<HttpResponse> {
@@ -68,14 +47,38 @@ pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_poo
     Ok(HttpResponse::Ok().json(new_category))
 }
 
-pub async fn new_report_form() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn signup_form() -> Result<HttpResponse> {
+    let html: String = templates::signup_form();
+    Ok(HttpResponse::Ok()
+       .content_type("text/html; charset=utf-8")
+       .body(html))
 }
 
-pub async fn new_report() -> Result<HttpResponse> {
-    unimplemented!();
+use crate::{db, models::User, error::MyError};
+use deadpool_postgres::{Client, Pool};
+pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let user_info = User {name: params.name.clone()};
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let new_user = db::add_user(&client, user_info).await?;
+    Ok(HttpResponse::Ok().json(new_user))
 }
 
-pub async fn report_show() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn signin_form() -> Result<HttpResponse> {
+    let html: String = templates::signin_form();
+    Ok(HttpResponse::Ok().body(html))
+}
+
+use actix_identity::Identity;
+pub async fn signin(params: web::Form<param::ParamsForSignIn>,
+                    db_pool: web::Data<Pool>,
+                    id: Identity) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user = db::search_user(&client, params.name.clone()).await?;
+    id.remember(user.name.clone());
+    Ok(HttpResponse::Ok().json(user))
+}
+
+pub async fn signout(id: Identity) -> HttpResponse {
+    id.forget();
+    HttpResponse::Ok().finish()
 }

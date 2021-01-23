@@ -14,6 +14,11 @@ async fn main() -> std::io::Result<()> {
     use actix_web::{
         App,
         HttpServer,
+        middleware::Logger,
+    };
+    use actix_identity::{
+        CookieIdentityPolicy,
+        IdentityService,
     };
     use crate::routes;
     use dotenv::dotenv;
@@ -26,6 +31,11 @@ async fn main() -> std::io::Result<()> {
 
     let server = HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
+            .wrap(IdentityService::new(
+                    CookieIdentityPolicy::new(&[0; 32])
+                    .name("auth-cookie")
+                    .secure(false)))
             .data(pool.clone())
             .configure(routes::app_config)
 

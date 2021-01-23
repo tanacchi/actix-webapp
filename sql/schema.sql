@@ -15,7 +15,7 @@ CREATE TABLE testing.categories (
 CREATE TABLE testing.reports (
   id          BIGSERIAL PRIMARY KEY,
   comment     VARCHAR(1500),
-  date        VARCHAR(20) NOT NULL UNIQUE,
+  date        DATE NOT NULL UNIQUE,
   category_id BIGSERIAL REFERENCES testing.categories(id),
   user_id     BIGSERIAL REFERENCES testing.users(id)
 );

@@ -120,6 +120,9 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
     Ok(HttpResponse::Ok().json(new_report))
 }
 
-pub async fn report_show() -> Result<HttpResponse> {
-    unimplemented!();
+pub async fn report_show(web::Path(report_id): web::Path<i64>,
+                         db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let report = db::get_report(&client, report_id).await?;
+    Ok(HttpResponse::Ok().json(report))
 }

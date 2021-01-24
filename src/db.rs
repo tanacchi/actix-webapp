@@ -84,3 +84,11 @@ pub async fn add_report(client: &Client, report: Report) -> Result<Report, MyErr
         .pop()
         .ok_or(MyError::NotFound)
 }
+
+pub async fn get_report(client: &Client, report_id: i64) -> Result<Report, MyError> {
+    let _stmt = include_str!("../sql/get_report.sql");
+    let _stmt = _stmt.replace("$table_fields", &Report::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+    let report = client.query_one(&stmt, &[&report_id]).await?;
+    Ok(Report::from_row_ref(&report)?)
+}

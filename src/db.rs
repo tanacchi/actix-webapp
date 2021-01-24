@@ -70,19 +70,28 @@ pub async fn add_report(client: &Client, report: Report) -> Result<Report, MyErr
     let _stmt = _stmt.replace("$table_fields", &Report::sql_table_fields());
     let stmt = client.prepare(&_stmt).await.unwrap();
 
-    client.query(&stmt,
+    let result = client.query(&stmt,
                  &[
                      &report.comment,
                      &report.date,
                      &report.category_id,
                      &report.user_id
                  ])
-        .await?
-        .iter()
-        .map(|row| Report::from_row_ref(row).unwrap())
-        .collect::<Vec<Report>>()
-        .pop()
-        .ok_or(MyError::NotFound)
+        .await;
+
+    match result {
+        Ok(report_vec) => {
+            report_vec.iter()
+                .map(|row| Report::from_row_ref(row).unwrap())
+                .collect::<Vec<Report>>()
+                .pop()
+                .ok_or(MyError::NotFound)
+        },
+        Err(err) => {
+            println!("ERROR: {}", err);
+            Err(MyError::NotFound)
+        }
+    }
 }
 
 pub async fn get_report(client: &Client, report_id: i64) -> Result<Report, MyError> {

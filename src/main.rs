@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     use dotenv::dotenv;
     use tokio_postgres::NoTls;
 
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    std::env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
     dotenv().ok();
 

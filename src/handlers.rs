@@ -92,7 +92,8 @@ pub async fn new_report_form(id: Identity, db_pool: web::Data<Pool>) -> Result<H
 }
 
 pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
-                        db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+                        db_pool: web::Data<Pool>,
+                        id: Identity) -> Result<HttpResponse> {
     use chrono::{Date, NaiveDateTime, Local, TimeZone};
     use crate::models::Report;
 
@@ -104,14 +105,17 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
         .map(|dt| dt.date())
         .unwrap();
 
-    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user_id: i64 = id.identity()
+        .and_then(|id_str| id_str.parse::<i64>().ok())
+        .unwrap();
     let _new_report = Report {
         id: -1,
         comment: params.comment.clone(),
         date: date.format("%Y-%m-%d").to_string(),
         category_id: params.category.clone(),
-        user_id: 1
+        user_id: user_id
     };
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let new_report = db::add_report(&client, _new_report).await?;
 
     println!("comment: {}\ndate:{:?}\ncategory:{}",

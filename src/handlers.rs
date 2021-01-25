@@ -74,7 +74,7 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
                     id: Identity) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user = db::search_user(&client, params.name.clone()).await?;
-    id.remember(user.name.clone());
+    id.remember(user.id.to_string());
     Ok(HttpResponse::Ok().json(user))
 }
 

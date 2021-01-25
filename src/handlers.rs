@@ -83,9 +83,11 @@ pub async fn signout(id: Identity) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
+pub async fn new_report_form(id: Identity, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let logged_in: bool = id.identity().is_some();
-    let html: String = templates::report_form(logged_in);
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let categories: Vec<Category> = db::get_all_categories(&client).await?;
+    let html: String = templates::report_form(logged_in, categories);
     Ok(HttpResponse::Ok().body(html))
 }
 

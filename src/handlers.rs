@@ -42,7 +42,7 @@ pub async fn category_form() -> Result<HttpResponse> {
 use crate::{models::Category};
 pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let _new_category = Category {name: params.name.clone()};
+    let _new_category = Category {id: -1, name: params.name.clone()};
     let new_category = db::add_category(&client, _new_category).await?;
     Ok(HttpResponse::Ok().json(new_category))
 }
@@ -57,7 +57,7 @@ pub async fn signup_form() -> Result<HttpResponse> {
 use crate::{db, models::User, error::MyError};
 use deadpool_postgres::{Client, Pool};
 pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
-    let user_info = User {name: params.name.clone()};
+    let user_info = User {id: -1, name: params.name.clone()};
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let new_user = db::add_user(&client, user_info).await?;
     Ok(HttpResponse::Ok().json(new_user))
@@ -104,6 +104,7 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
 
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let _new_report = Report {
+        id: -1,
         comment: params.comment.clone(),
         date: date.format("%Y-%m-%d").to_string(),
         category_id: 1,

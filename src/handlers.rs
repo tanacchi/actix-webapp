@@ -82,3 +82,47 @@ pub async fn signout(id: Identity) -> HttpResponse {
     id.forget();
     HttpResponse::Ok().finish()
 }
+
+pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
+    let logged_in: bool = id.identity().is_some();
+    let html: String = templates::report_form(logged_in);
+    Ok(HttpResponse::Ok().body(html))
+}
+
+pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
+                        db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    use chrono::{Date, NaiveDateTime, Local, TimeZone};
+    use crate::models::Report;
+
+    let date: Date<Local> = NaiveDateTime::parse_from_str(
+        &format!("{} 00:00:00", &params.date),
+        "%Y-%m-%d %H:%M:%S")
+        .map(|dt| Local.from_local_datetime(&dt))
+        .unwrap()
+        .map(|dt| dt.date())
+        .unwrap();
+
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let _new_report = Report {
+        comment: params.comment.clone(),
+        date: date.format("%Y-%m-%d").to_string(),
+        category_id: 1,
+        user_id: 1
+    };
+    let new_report = db::add_report(&client, _new_report).await?;
+
+    println!("comment: {}\ndate:{:?}\ncategory:{}",
+             params.comment.clone(),
+             date,
+             params.category.clone()
+    );
+
+    Ok(HttpResponse::Ok().json(new_report))
+}
+
+pub async fn report_show(web::Path(report_id): web::Path<i64>,
+                         db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let report = db::get_report(&client, report_id).await?;
+    Ok(HttpResponse::Ok().json(report))
+}

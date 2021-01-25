@@ -1,4 +1,7 @@
-use crate::{models::User, models::Category, error::MyError};
+use crate::{
+    models::{User, Category, Report},
+    error::MyError
+};
 use deadpool_postgres::Client;
 use tokio_pg_mapper::FromTokioPostgresRow;
 
@@ -60,4 +63,41 @@ pub async fn add_category(client: &Client, caterogy: Category) -> Result<Categor
         .collect::<Vec<Category>>()
         .pop()
         .ok_or(MyError::NotFound)
+}
+
+pub async fn add_report(client: &Client, report: Report) -> Result<Report, MyError> {
+    let _stmt = include_str!("../sql/add_report.sql");
+    let _stmt = _stmt.replace("$table_fields", &Report::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+
+    let result = client.query(&stmt,
+                 &[
+                     &report.comment,
+                     &report.date,
+                     &report.category_id,
+                     &report.user_id
+                 ])
+        .await;
+
+    match result {
+        Ok(report_vec) => {
+            report_vec.iter()
+                .map(|row| Report::from_row_ref(row).unwrap())
+                .collect::<Vec<Report>>()
+                .pop()
+                .ok_or(MyError::NotFound)
+        },
+        Err(err) => {
+            println!("ERROR: {}", err);
+            Err(MyError::NotFound)
+        }
+    }
+}
+
+pub async fn get_report(client: &Client, report_id: i64) -> Result<Report, MyError> {
+    let _stmt = include_str!("../sql/get_report.sql");
+    let _stmt = _stmt.replace("$table_fields", &Report::sql_table_fields());
+    let stmt = client.prepare(&_stmt).await.unwrap();
+    let report = client.query_one(&stmt, &[&report_id]).await?;
+    Ok(Report::from_row_ref(&report)?)
 }

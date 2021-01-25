@@ -14,3 +14,10 @@ pub struct ParamsForSignIn {
 pub struct ParamsForNewCategory {
     pub name: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ParamsForNewReport {
+    pub date: String,
+    pub comment: String,
+    pub category: String,
+}

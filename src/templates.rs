@@ -45,6 +45,9 @@ pub fn dashboard(logged_in: bool) -> String {
                 a href="/signout" { "SignOut" }
             }
             p {
+                a href="/reports/new" { "New Report" }
+            }
+            p {
                 a href="/categories" { "Category List" }
             }
             p {
@@ -63,6 +66,35 @@ pub fn dashboard(logged_in: bool) -> String {
             }
             p {
                 a href="/users" { "User List" }
+            }
+        }
+    };
+    content.into_string()
+}
+
+pub fn report_form(logged_in: bool) -> String {
+    let content = html! {
+        h1 { "New Report" }
+        @if logged_in {
+            form method="POST" {
+                label for="date"  { "Date" }
+                input type="date" name="date";
+
+                label for="comment" { "Comment" }
+                input type="textarea" name="comment";
+
+
+                label for="category" { "Category" }
+                select name="category" {
+                    option value="a" { "a" }
+                    option value="b" { "b" }
+                    option value="c" { "c" }
+                }
+            }
+        } @else {
+            p { "Please login." }
+            p {
+                a href="/signin" { "SignIn" }
             }
         }
     };

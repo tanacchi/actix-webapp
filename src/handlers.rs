@@ -109,7 +109,7 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
         id: -1,
         comment: params.comment.clone(),
         date: date.format("%Y-%m-%d").to_string(),
-        category_id: 1,
+        category_id: params.category.clone(),
         user_id: 1
     };
     let new_report = db::add_report(&client, _new_report).await?;

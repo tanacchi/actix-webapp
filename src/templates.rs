@@ -72,7 +72,8 @@ pub fn dashboard(logged_in: bool) -> String {
     content.into_string()
 }
 
-pub fn report_form(logged_in: bool) -> String {
+use crate::models::Category;
+pub fn report_form(logged_in: bool, categories: Vec<Category>) -> String {
     let content = html! {
         h1 { "New Report" }
         @if logged_in {
@@ -86,9 +87,11 @@ pub fn report_form(logged_in: bool) -> String {
 
                 label for="category" { "Category" }
                 select name="category" {
-                    option value="a" { "a" }
-                    option value="b" { "b" }
-                    option value="c" { "c" }
+                    @for category in &categories {
+                        option value=(category.id) {
+                            (category.name)
+                        }
+                    }
                 }
             }
         } @else {

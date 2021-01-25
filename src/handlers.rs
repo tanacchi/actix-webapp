@@ -42,7 +42,7 @@ pub async fn category_form() -> Result<HttpResponse> {
 use crate::{models::Category};
 pub async fn add_category(params: web::Form<param::ParamsForNewCategory>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let _new_category = Category {name: params.name.clone()};
+    let _new_category = Category {id: -1, name: params.name.clone()};
     let new_category = db::add_category(&client, _new_category).await?;
     Ok(HttpResponse::Ok().json(new_category))
 }
@@ -57,7 +57,7 @@ pub async fn signup_form() -> Result<HttpResponse> {
 use crate::{db, models::User, error::MyError};
 use deadpool_postgres::{Client, Pool};
 pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
-    let user_info = User {name: params.name.clone()};
+    let user_info = User {id: -1, name: params.name.clone()};
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let new_user = db::add_user(&client, user_info).await?;
     Ok(HttpResponse::Ok().json(new_user))
@@ -74,7 +74,7 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
                     id: Identity) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user = db::search_user(&client, params.name.clone()).await?;
-    id.remember(user.name.clone());
+    id.remember(user.id.to_string());
     Ok(HttpResponse::Ok().json(user))
 }
 
@@ -83,14 +83,17 @@ pub async fn signout(id: Identity) -> HttpResponse {
     HttpResponse::Ok().finish()
 }
 
-pub async fn new_report_form(id: Identity) -> Result<HttpResponse> {
+pub async fn new_report_form(id: Identity, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let logged_in: bool = id.identity().is_some();
-    let html: String = templates::report_form(logged_in);
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let categories: Vec<Category> = db::get_all_categories(&client).await?;
+    let html: String = templates::report_form(logged_in, categories);
     Ok(HttpResponse::Ok().body(html))
 }
 
 pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
-                        db_pool: web::Data<Pool>) -> Result<HttpResponse> {
+                        db_pool: web::Data<Pool>,
+                        id: Identity) -> Result<HttpResponse> {
     use chrono::{Date, NaiveDateTime, Local, TimeZone};
     use crate::models::Report;
 
@@ -102,13 +105,17 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
         .map(|dt| dt.date())
         .unwrap();
 
-    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+    let user_id: i64 = id.identity()
+        .and_then(|id_str| id_str.parse::<i64>().ok())
+        .unwrap();
     let _new_report = Report {
+        id: -1,
         comment: params.comment.clone(),
         date: date.format("%Y-%m-%d").to_string(),
-        category_id: 1,
-        user_id: 1
+        category_id: params.category.clone(),
+        user_id: user_id
     };
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let new_report = db::add_report(&client, _new_report).await?;
 
     println!("comment: {}\ndate:{:?}\ncategory:{}",

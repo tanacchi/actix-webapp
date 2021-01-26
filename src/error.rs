@@ -3,6 +3,7 @@ use deadpool_postgres::PoolError;
 use derive_more::{Display, From};
 use tokio_pg_mapper::Error as PGMError;
 use tokio_postgres::error::Error as PGError;
+use log::{warn};
 
 #[derive(Display, From, Debug)]
 pub enum MyError {

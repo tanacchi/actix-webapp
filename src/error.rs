@@ -17,11 +17,22 @@ impl std::error::Error for MyError {}
 impl ResponseError for MyError {
     fn error_response(&self) -> HttpResponse {
         match *self {
-            MyError::NotFound => HttpResponse::NotFound().finish(),
-            MyError::PoolError(ref err) => {
+            MyError::NotFound => {
+                warn!("NotFound");
+                HttpResponse::NotFound().finish()
+            },
+            MyError::PGError(ref err) => {
+                warn!("PoolError: {}", err);
                 HttpResponse::InternalServerError().body(err.to_string())
-            }
-            _ => HttpResponse::InternalServerError().finish(),
+            },
+            MyError::PoolError(ref err) => {
+                warn!("PoolError: {}", err);
+                HttpResponse::InternalServerError().body(err.to_string())
+            },
+            MyError::PGMError(ref err) => {
+                warn!("PGMError: {}", err);
+                HttpResponse::InternalServerError().finish()
+            },
         }
     }
 }

@@ -54,7 +54,11 @@ pub async fn signup_form() -> Result<HttpResponse> {
        .body(html))
 }
 
-use crate::{db, models::User, error::MyError};
+use crate::{
+    db,
+    models::User,
+    error::{MyError, AccountError},
+};
 use deadpool_postgres::{Client, Pool};
 pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let user_info = User {id: -1, name: params.name.clone()};
@@ -73,7 +77,9 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
                     db_pool: web::Data<Pool>,
                     id: Identity) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let user = db::search_user(&client, params.name.clone()).await?;
+    let user = db::search_user(&client, params.name.clone())
+        .await
+        .map_err(|_x| AccountError::SignInFailed)?;  // FIXME
     id.remember(user.id.to_string());
     Ok(HttpResponse::Ok().json(user))
 }

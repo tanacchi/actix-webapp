@@ -12,6 +12,7 @@ pub enum MyError {
     PGMError(PGMError),
     PoolError(PoolError),
 }
+
 impl std::error::Error for MyError {}
 
 impl ResponseError for MyError {
@@ -33,6 +34,29 @@ impl ResponseError for MyError {
                 warn!("PGMError: {}", err);
                 HttpResponse::InternalServerError().finish()
             },
+        }
+    }
+}
+
+#[derive(Display, From, Debug)]
+pub enum AccountError {
+    SignUpFailed,
+    SignInFailed,
+}
+
+impl std::error::Error for AccountError {}
+
+impl ResponseError for AccountError {
+    fn error_response(&self) -> HttpResponse {
+        match *self {
+            AccountError::SignUpFailed => {
+                warn!("SignUpFailed");
+                HttpResponse::BadRequest().finish()
+            },
+            AccountError::SignInFailed => {
+                warn!("SignInFailed");
+                HttpResponse::Unauthorized().finish()
+            }
         }
     }
 }

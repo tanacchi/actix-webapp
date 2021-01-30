@@ -22,7 +22,7 @@ impl ResponseError for MyError {
                 HttpResponse::NotFound().finish()
             },
             MyError::PGError(ref err) => {
-                warn!("PoolError: {}", err);
+                warn!("PGError: {}", err);
                 HttpResponse::InternalServerError().body(err.to_string())
             },
             MyError::PoolError(ref err) => {

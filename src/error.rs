@@ -40,7 +40,7 @@ impl ResponseError for MyError {
 
 #[derive(Display, From, Debug)]
 pub enum AccountError {
-    SignUpFailed,
+    SignUpFailed(MyError),
     SignInFailed,
 }
 
@@ -49,7 +49,7 @@ impl std::error::Error for AccountError {}
 impl ResponseError for AccountError {
     fn error_response(&self) -> HttpResponse {
         match *self {
-            AccountError::SignUpFailed => {
+            AccountError::SignUpFailed(_) => {
                 warn!("SignUpFailed");
                 HttpResponse::BadRequest().finish()
             },

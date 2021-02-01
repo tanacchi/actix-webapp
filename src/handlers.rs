@@ -63,7 +63,9 @@ use deadpool_postgres::{Client, Pool};
 pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let user_info = User {id: -1, name: params.name.clone()};
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let new_user = db::add_user(&client, user_info).await?;
+    let new_user = db::add_user(&client, user_info)
+        .await
+        .map_err(AccountError::SignUpFailed)?;
     Ok(HttpResponse::Ok().json(new_user))
 }
 
@@ -79,7 +81,7 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let user = db::search_user(&client, params.name.clone())
         .await
-        .map_err(|_x| AccountError::SignInFailed)?;  // FIXME
+        .map_err(|_err| AccountError::SignInFailed)?;  // FIXME
     id.remember(user.id.to_string());
     Ok(HttpResponse::Ok().json(user))
 }

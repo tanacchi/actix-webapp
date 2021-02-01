@@ -8,6 +8,7 @@ use log::{warn};
 #[derive(Display, From, Debug)]
 pub enum MyError {
     NotFound,
+    InvalidDateOfReport,
     PGError(PGError),
     PGMError(PGMError),
     PoolError(PoolError),
@@ -21,6 +22,10 @@ impl ResponseError for MyError {
             MyError::NotFound => {
                 warn!("NotFound");
                 HttpResponse::NotFound().finish()
+            },
+            MyError::InvalidDateOfReport => {
+                warn!("InvalidDateOfReport");
+                HttpResponse::BadRequest().finish()
             },
             MyError::PGError(ref err) => {
                 warn!("PGError: {}", err);

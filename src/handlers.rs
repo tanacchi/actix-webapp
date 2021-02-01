@@ -102,7 +102,7 @@ pub async fn new_report_form(id: Identity, db_pool: web::Data<Pool>) -> Result<H
 pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
                         db_pool: web::Data<Pool>,
                         id: Identity) -> Result<HttpResponse> {
-    use chrono::{Date, NaiveDateTime, Local, TimeZone};
+    use chrono::{Date, NaiveDateTime, Local, TimeZone, LocalResult};
     use crate::models::Report;
 
     let date: Date<Local> = NaiveDateTime::parse_from_str(
@@ -112,6 +112,10 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
         .unwrap()
         .map(|dt| dt.date())
         .unwrap();
+
+    // if date > Local::today() {
+        // return MyError::InvalidDateOfReport;
+    // }
 
     let user_id: i64 = id.identity()
         .and_then(|id_str| id_str.parse::<i64>().ok())

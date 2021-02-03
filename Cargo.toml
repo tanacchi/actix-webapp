@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 actix-identity = "*"
+actix-cors = "*"
 actix-web = "3"
 chrono = "*"
 config = "0.10.1"

@@ -54,12 +54,18 @@ pub async fn signup_form() -> Result<HttpResponse> {
        .body(html))
 }
 
-use crate::{db, models::User, error::MyError};
+use crate::{
+    db,
+    models::User,
+    error::{MyError, AccountError},
+};
 use deadpool_postgres::{Client, Pool};
 pub async fn signup(params : web::Form<param::ParamsForSignUp>, db_pool: web::Data<Pool>) -> Result<HttpResponse> {
     let user_info = User {id: -1, name: params.name.clone()};
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let new_user = db::add_user(&client, user_info).await?;
+    let new_user = db::add_user(&client, user_info)
+        .await
+        .map_err(AccountError::SignUpFailed)?;
     Ok(HttpResponse::Ok().json(new_user))
 }
 
@@ -73,7 +79,9 @@ pub async fn signin(params: web::Form<param::ParamsForSignIn>,
                     db_pool: web::Data<Pool>,
                     id: Identity) -> Result<HttpResponse> {
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
-    let user = db::search_user(&client, params.name.clone()).await?;
+    let user = db::search_user(&client, params.name.clone())
+        .await
+        .map_err(|_err| AccountError::SignInFailed)?;  // FIXME
     id.remember(user.id.to_string());
     Ok(HttpResponse::Ok().json(user))
 }
@@ -94,7 +102,7 @@ pub async fn new_report_form(id: Identity, db_pool: web::Data<Pool>) -> Result<H
 pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
                         db_pool: web::Data<Pool>,
                         id: Identity) -> Result<HttpResponse> {
-    use chrono::{Date, NaiveDateTime, Local, TimeZone};
+    use chrono::{Date, NaiveDateTime, Local, TimeZone, LocalResult};
     use crate::models::Report;
 
     let date: Date<Local> = NaiveDateTime::parse_from_str(
@@ -105,15 +113,20 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
         .map(|dt| dt.date())
         .unwrap();
 
+    // if date > Local::today() {
+        // return MyError::InvalidDateOfReport;
+    // }
+
     let user_id: i64 = id.identity()
         .and_then(|id_str| id_str.parse::<i64>().ok())
         .unwrap();
     let _new_report = Report {
         id: -1,
+        user_id: 1,
         comment: params.comment.clone(),
         date: date.format("%Y-%m-%d").to_string(),
-        category_id: params.category.clone(),
-        user_id: user_id
+        category_id: params.category.clone()
+        // user_id: user_id,
     };
     let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
     let new_report = db::add_report(&client, _new_report).await?;
@@ -121,7 +134,8 @@ pub async fn new_report(params: web::Form<param::ParamsForNewReport>,
     println!("comment: {}\ndate:{:?}\ncategory:{}",
              params.comment.clone(),
              date,
-             params.category.clone()
+             // params.category.clone()
+             1
     );
 
     Ok(HttpResponse::Ok().json(new_report))

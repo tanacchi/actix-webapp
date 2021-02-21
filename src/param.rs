@@ -19,5 +19,5 @@ pub struct ParamsForNewCategory {
 pub struct ParamsForNewReport {
     pub date: String,
     pub comment: String,
-    // pub category: i32,
+    pub category: i64,
 }

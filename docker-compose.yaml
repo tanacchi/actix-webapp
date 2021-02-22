@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  db:
+    image: "postgres:13.2"
+    container_name: prochart-local-db
+    ports:
+      - "15432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: prochart-postgres
+      DATABASE_HOST: localhost
+      POSTGRES_HOST_AUTH_METHOD: trust  # FIXME
+    hostname: localhost
+    restart: always
+    user: root
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    # volumes:
+    #   - $PWD/docker/pg:/var/lib/postgresql
+
+  # pgadmin4:
+  #   image: dpage/pgadmin4:3.3
+  #   container_name: pgadmin4
+  #   ports:
+  #     - '80:80'
+  #   volumes:
+  #     - ./pgadmin:/var/lib/pgadmin/storage
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: root
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #     hostname: pgadmin4
+  #     restart: always

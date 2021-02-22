@@ -1,11 +1,22 @@
 version: '3'
 services:
+  db:
+    image: postgres:13.2
+    environment:
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./sql/initdb:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/postgresql/data
+    -ports:
+      - 5432:5432
   app:
     build: .
     ports:
       - 8080:8080
     volumes:
       - .:/app
+    depends_on:
+      - db
     command: /bin/sh -c "cargo watch -x run"
   server:
     image: nginx:latest
@@ -15,3 +26,6 @@ services:
       - app
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+
+volumes:
+  db_data:

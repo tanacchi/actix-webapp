@@ -3,11 +3,12 @@ services:
   db:
     image: postgres:13.2
     environment:
+      - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     volumes:
       - ./sql/initdb:/docker-entrypoint-initdb.d
       - db_data:/var/lib/postgresql/data
-    -ports:
+    ports:
       - 5432:5432
   app:
     build: .

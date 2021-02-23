@@ -1,1 +1,2 @@
-createdb -O root testing_db
+su postgres
+createdb -O postgres testing_db

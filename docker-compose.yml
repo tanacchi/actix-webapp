@@ -5,9 +5,9 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=testing_db
     volumes:
       - ./sql/initdb:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
   app:
